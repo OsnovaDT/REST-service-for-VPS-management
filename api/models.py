@@ -48,4 +48,4 @@ class VPS(models.Model):
 
         verbose_name = 'VPS'
         verbose_name_plural = 'VPS'
-        ordering = ['-cpu']
+        ordering = ['-uid']
