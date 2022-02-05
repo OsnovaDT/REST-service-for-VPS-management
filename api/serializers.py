@@ -12,4 +12,4 @@ class VPSSerializer(HyperlinkedModelSerializer):
         """Info about the serializer"""
 
         model = VPS
-        fields = '__all__'
+        fields = ('uid', 'url', 'cpu', 'ram', 'hdd', 'status',)
