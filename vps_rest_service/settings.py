@@ -75,6 +75,14 @@ USE_I18N = True
 
 USE_L10N = True
 
+### DRF ###
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
 ### OTHER ###
 
 SECRET_KEY = config('SECRET_KEY')
