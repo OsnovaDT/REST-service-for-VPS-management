@@ -13,7 +13,12 @@ from api.serializers import VPSSerializer
 def get_param_or_zero(request: Request, param: str) -> str:
     """Return query parameter or 0 if it's None"""
 
-    return request.query_params.get(param) or '0'
+    try:
+        param = request.query_params.get(param) or '0'
+    except TypeError:
+        param = '0'
+
+    return str(param)
 
 
 def get_param_or_max_int(request: Request, param):
@@ -51,7 +56,7 @@ class VPSViewSet(viewsets.ModelViewSet):
 
     queryset = VPS.objects.all()
 
-    pagination_class = VPSPagination
+    # pagination_class = VPSPagination
     serializer_class = VPSSerializer
 
     def list(self, request: Request):
