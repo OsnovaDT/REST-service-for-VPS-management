@@ -123,3 +123,5 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+MAX_POSITIVE_INTEGER = 2_147_483_647

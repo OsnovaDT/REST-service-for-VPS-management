@@ -1,10 +1,42 @@
 """Views for api app"""
 
+from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.request import Request
 
 from api.models import VPS
 from api.serializers import VPSSerializer
+
+
+def get_param_or_zero(request: Request, param: str) -> str:
+    """Return query parameter or 0 if it's None"""
+
+    return request.query_params.get(param) or '0'
+
+
+def get_param_or_max_int(request: Request, param):
+    """Return query parameter or max positive integer if it's None"""
+
+    return request.query_params.get(param) or settings.MAX_POSITIVE_INTEGER
+
+
+def get_vps_viewset_query_params(request: Request) -> dict:
+    """Return query params from VPS viewset request"""
+
+    return {
+        'status': request.query_params.get('status'),
+
+        'cpu_from': get_param_or_zero(request, 'cpu_from'),
+        'cpu_to': get_param_or_max_int(request, 'cpu_to'),
+
+        'ram_from': get_param_or_zero(request, 'ram_from'),
+        'ram_to': get_param_or_max_int(request, 'ram_to'),
+
+        'hdd_from': get_param_or_zero(request, 'hdd_from'),
+        'hdd_to': get_param_or_max_int(request, 'hdd_to'),
+    }
 
 
 class VPSPagination(PageNumberPagination):
@@ -21,3 +53,23 @@ class VPSViewSet(viewsets.ModelViewSet):
 
     pagination_class = VPSPagination
     serializer_class = VPSSerializer
+
+    def list(self, request: Request):
+        query_params = get_vps_viewset_query_params(request)
+
+        status = query_params['status']
+
+        queryset = VPS.objects.filter(
+            cpu__range=(query_params['cpu_from'], query_params['cpu_to']),
+            ram__range=(query_params['ram_from'], query_params['ram_to']),
+            hdd__range=(query_params['hdd_from'], query_params['hdd_to']),
+        )
+
+        if status:
+            queryset = queryset.filter(status=status)
+
+        serializer = VPSSerializer(
+            queryset, many=True, context={'request': request},
+        )
+
+        return Response(serializer.data)
