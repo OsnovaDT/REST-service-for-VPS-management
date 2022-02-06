@@ -2,14 +2,28 @@
 
 from django.test import TestCase, tag
 from django.http import HttpRequest
+from django.db.models.query import QuerySet
 
 from api.views import (
     get_param_or_zero, get_param_or_max_int, get_vps_query_params,
+    get_vps_queryset_by_query_params,
 )
 from api.tests.constants import (
     SIMPLE_QUERY_PARAMS, DIFFERENT_VALUES, MAX_POSITIVE_INTEGER,
     MULTIPLE_QUERY_PARAMS, NOT_FULL_QUERY_PARAMS,
 )
+from api.models import VPS
+
+
+def get_vps_expected_queryset_by_status(status: str | None) -> QuerySet:
+    """Return expected VPS queryset for the status"""
+
+    if not status or status == 'delete':
+        queryset = VPS.objects.all()
+    else:
+        queryset = VPS.objects.filter(status=status)
+
+    return queryset
 
 
 @tag('api_views')
@@ -20,6 +34,37 @@ class ViewsTests(TestCase):
     def setUpTestData(cls) -> None:
         cls.test_request = HttpRequest()
         cls.test_request.query_params = SIMPLE_QUERY_PARAMS
+
+        VPS.objects.create(cpu=0, ram=512, hdd=256, status='started')
+        VPS.objects.create(cpu=2, ram=1024, hdd=512, status='blocked')
+        VPS.objects.create(cpu=2, ram=256, hdd=256, status='blocked')
+        VPS.objects.create(cpu=6, ram=256, hdd=512, status='started')
+        VPS.objects.create(cpu=10, ram=128, hdd=1024, status='stopped')
+
+        cls.default_query_params = {
+            'status': 'started',
+
+            'cpu_from': 0,
+            'cpu_to': MAX_POSITIVE_INTEGER,
+
+            'ram_from': 0,
+            'ram_to': MAX_POSITIVE_INTEGER,
+
+            'hdd_from': 0,
+            'hdd_to': MAX_POSITIVE_INTEGER,
+        }
+
+    def __get_query_params_by_status(self, status: str) -> dict:
+        """Return query params with or without status"""
+
+        query_params = self.default_query_params.copy()
+
+        if status == 'delete':
+            query_params.pop('status')
+        else:
+            query_params['status'] = status
+
+        return query_params
 
     def test_get_param_or_zero(self) -> None:
         """Test get_param_or_zero function"""
@@ -126,3 +171,19 @@ class ViewsTests(TestCase):
                     )
 
             self.assertEqual(real_query_params, expected_query_params)
+
+    def test_get_vps_queryset_by_query_params(self) -> None:
+        """Test get_vps_queryset_by_query_params function"""
+
+        # Test status param
+
+        statuses = ('started', 'blocked', 'stopped', None, 'delete')
+
+        for status in statuses:
+            query_params = self.__get_query_params_by_status(status)
+
+            real_queryset = get_vps_queryset_by_query_params(query_params)
+            expected_queryset = get_vps_expected_queryset_by_status(status)
+
+            with self.subTest(status):
+                self.assertEqual(set(real_queryset), set(expected_queryset))
