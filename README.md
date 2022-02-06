@@ -10,3 +10,6 @@ sudo docker-compose up --build
 
 # Work of the service
 ![Work of the service](https://github.com/OsnovaDT/REST-servis-for-VPS-management-DRF/blob/main/readme_files/api.gif)
+
+# Tests launch:
+* docker-compose exec web python manage.py test
