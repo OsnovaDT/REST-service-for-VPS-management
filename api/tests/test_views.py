@@ -54,6 +54,30 @@ class ViewsTests(TestCase):
             'hdd_to': MAX_POSITIVE_INTEGER,
         }
 
+        cls.query_params_without_cpu_to ={
+            'status': 'started',
+
+            'cpu_from': 4,
+
+            'ram_from': 256,
+            'ram_to': 1024,
+
+            'hdd_from': 500,
+            'hdd_to': 2_000,
+        }
+
+        cls.query_params_without_hdd_from ={
+            'status': 'started',
+
+            'cpu_from': 4,
+
+            'ram_from': 256,
+            'ram_to': 1024,
+
+            'hdd_from': 500,
+            'hdd_to': 2_000,
+        }
+
     def __get_query_params_by_status(self, status: str) -> dict:
         """Return query params with or without status"""
 
@@ -175,6 +199,8 @@ class ViewsTests(TestCase):
     def test_get_vps_queryset_by_query_params(self) -> None:
         """Test get_vps_queryset_by_query_params function"""
 
+        # Test that «try» part work correctly
+
         # Test status param
 
         statuses = ('started', 'blocked', 'stopped', None, 'delete')
@@ -187,3 +213,23 @@ class ViewsTests(TestCase):
 
             with self.subTest(status):
                 self.assertEqual(set(real_queryset), set(expected_queryset))
+
+        # Test KeyError except
+
+        queryset_without_cpu_to = get_vps_queryset_by_query_params(
+            self.query_params_without_cpu_to
+        )
+
+        queryset_without_hdd_from = get_vps_queryset_by_query_params(
+            self.query_params_without_cpu_to
+        )
+
+        self.assertEqual(type(queryset_without_cpu_to), QuerySet)
+        self.assertEqual(type(queryset_without_hdd_from), QuerySet)
+
+        # Test that «except» part work correctly
+        for value in DIFFERENT_VALUES:
+            real_queryset = get_vps_queryset_by_query_params(value)
+
+            with self.subTest(value):
+                self.assertEqual(set(real_queryset), set(VPS.objects.all()))
