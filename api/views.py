@@ -63,10 +63,11 @@ def get_vps_queryset_by_query_params(query_params: dict) -> QuerySet:
         hdd__range=(query_params['hdd_from'], query_params['hdd_to']),
     )
 
-    status = query_params['status']
+    if 'status' in query_params.keys():
+        status = query_params['status']
 
-    if status:
-        queryset = queryset.filter(status=status)
+        if status:
+            queryset = queryset.filter(status=status)
 
     return queryset
 
