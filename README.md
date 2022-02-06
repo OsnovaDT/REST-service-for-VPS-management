@@ -9,7 +9,7 @@ sudo docker-compose up --build
 * docker-compose exec web python manage.py migrate
 
 # Work of the service
-![Work of the service](https://github.com/OsnovaDT/REST-servis-for-VPS-management-DRF/blob/main/readme_files/api.gif)
+![Work of the service](https://github.com/OsnovaDT/REST-servis-for-VPS-management-DRF/blob/main/readme_files/work_of_service.gif)
 
 # Tests launch:
 * docker-compose exec web python manage.py test
