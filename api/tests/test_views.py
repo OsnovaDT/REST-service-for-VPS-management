@@ -3,8 +3,10 @@
 from django.test import TestCase, tag
 from django.http import HttpRequest
 
-from api.views import get_param_or_zero
-from api.tests.constants import TEST_QUERY_PARAM, DIFFERENT_VALUES
+from api.views import get_param_or_zero, get_param_or_max_int
+from api.tests.constants import (
+    TEST_QUERY_PARAM, DIFFERENT_VALUES, MAX_POSITIVE_INTEGER,
+)
 
 
 @tag('api')
@@ -31,3 +33,18 @@ class ViewsTests(TestCase):
                 real_value = get_param_or_zero(self.test_request, param)
 
                 self.assertEqual(real_value, '0')
+
+    def test_get_param_or_max_int(self):
+        """Test get_param_or_max_int function"""
+
+        for param, expected_value in TEST_QUERY_PARAM.items():
+            with self.subTest(f'{param=}'):
+                real_value = get_param_or_max_int(self.test_request, param)
+
+                self.assertEqual(real_value, expected_value)
+
+        for param in DIFFERENT_VALUES:
+            with self.subTest(f'{param=}'):
+                real_value = get_param_or_max_int(self.test_request, param)
+
+                self.assertEqual(real_value, MAX_POSITIVE_INTEGER)

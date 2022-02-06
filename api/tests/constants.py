@@ -29,3 +29,5 @@ DIFFERENT_VALUES = (
     range(100), 'class', 'def', 'int', '\n', '\t', TestClass,
     lambda x: x, int, bool, str, object,
 )
+
+MAX_POSITIVE_INTEGER = 2_147_483_647
