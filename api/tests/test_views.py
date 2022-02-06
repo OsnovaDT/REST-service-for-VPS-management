@@ -28,11 +28,17 @@ class ViewsTests(TestCase):
 
                 self.assertEqual(real_value, expected_value)
 
-        for param in DIFFERENT_VALUES:
-            with self.subTest(f'{param=}'):
-                real_value = get_param_or_zero(self.test_request, param)
+        for value in DIFFERENT_VALUES:
+            with self.subTest(f'{value=}'):
+                real_value_for_incorrect_param = get_param_or_zero(
+                    self.test_request, value
+                )
+                real_value_for_incorrect_request = get_param_or_zero(
+                    value, 'param'
+                )
 
-                self.assertEqual(real_value, '0')
+                self.assertEqual(real_value_for_incorrect_param, '0')
+                self.assertEqual(real_value_for_incorrect_request, '0')
 
     def test_get_param_or_max_int(self):
         """Test get_param_or_max_int function"""
@@ -43,8 +49,18 @@ class ViewsTests(TestCase):
 
                 self.assertEqual(real_value, expected_value)
 
-        for param in DIFFERENT_VALUES:
-            with self.subTest(f'{param=}'):
-                real_value = get_param_or_max_int(self.test_request, param)
+        for value in DIFFERENT_VALUES:
+            with self.subTest(f'{value=}'):
+                real_value_for_incorrect_param = get_param_or_max_int(
+                    self.test_request, value
+                )
+                real_value_for_incorrect_request = get_param_or_max_int(
+                    value, 'param'
+                )
 
-                self.assertEqual(real_value, MAX_POSITIVE_INTEGER)
+                self.assertEqual(
+                    real_value_for_incorrect_param, MAX_POSITIVE_INTEGER
+                )
+                self.assertEqual(
+                    real_value_for_incorrect_request, MAX_POSITIVE_INTEGER
+                )
