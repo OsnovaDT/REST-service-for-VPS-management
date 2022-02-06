@@ -36,18 +36,23 @@ def get_param_or_max_int(request: Request, param):
 def get_vps_viewset_query_params(request: Request) -> dict:
     """Return query params from VPS viewset request"""
 
-    return {
-        'status': request.query_params.get('status'),
+    try:
+        query_params = {
+            'status': request.query_params.get('status'),
 
-        'cpu_from': get_param_or_zero(request, 'cpu_from'),
-        'cpu_to': get_param_or_max_int(request, 'cpu_to'),
+            'cpu_from': get_param_or_zero(request, 'cpu_from'),
+            'cpu_to': get_param_or_max_int(request, 'cpu_to'),
 
-        'ram_from': get_param_or_zero(request, 'ram_from'),
-        'ram_to': get_param_or_max_int(request, 'ram_to'),
+            'ram_from': get_param_or_zero(request, 'ram_from'),
+            'ram_to': get_param_or_max_int(request, 'ram_to'),
 
-        'hdd_from': get_param_or_zero(request, 'hdd_from'),
-        'hdd_to': get_param_or_max_int(request, 'hdd_to'),
-    }
+            'hdd_from': get_param_or_zero(request, 'hdd_from'),
+            'hdd_to': get_param_or_max_int(request, 'hdd_to'),
+        }
+    except AttributeError:
+        query_params = None
+
+    return query_params
 
 
 class VPSPagination(PageNumberPagination):
@@ -68,16 +73,19 @@ class VPSViewSet(viewsets.ModelViewSet):
     def list(self, request: Request):
         query_params = get_vps_viewset_query_params(request)
 
-        status = query_params['status']
+        if query_params:
+            status = query_params['status']
 
-        queryset = VPS.objects.filter(
-            cpu__range=(query_params['cpu_from'], query_params['cpu_to']),
-            ram__range=(query_params['ram_from'], query_params['ram_to']),
-            hdd__range=(query_params['hdd_from'], query_params['hdd_to']),
-        )
+            queryset = VPS.objects.filter(
+                cpu__range=(query_params['cpu_from'], query_params['cpu_to']),
+                ram__range=(query_params['ram_from'], query_params['ram_to']),
+                hdd__range=(query_params['hdd_from'], query_params['hdd_to']),
+            )
 
-        if status:
-            queryset = queryset.filter(status=status)
+            if status:
+                queryset = queryset.filter(status=status)
+        else:
+            queryset = VPS.objects.all()
 
         serializer = VPSSerializer(
             queryset, many=True, context={'request': request},
