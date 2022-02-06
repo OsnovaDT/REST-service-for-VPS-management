@@ -15,7 +15,7 @@ def get_param_or_zero(request: Request, param: str) -> str:
 
     try:
         param = request.query_params.get(param) or '0'
-    except TypeError:
+    except (TypeError, AttributeError):
         param = '0'
 
     return str(param)
@@ -27,7 +27,7 @@ def get_param_or_max_int(request: Request, param):
     try:
         param = request.query_params.get(param) \
             or settings.MAX_POSITIVE_INTEGER
-    except TypeError:
+    except (TypeError, AttributeError):
         param = settings.MAX_POSITIVE_INTEGER
 
     return param
