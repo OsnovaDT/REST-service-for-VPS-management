@@ -3,9 +3,15 @@
 from django.test import TestCase, tag
 from django.http import HttpRequest
 
-from api.views import get_param_or_zero, get_param_or_max_int
+from api.views import (
+    get_param_or_zero, get_param_or_max_int, get_vps_viewset_query_params,
+)
 from api.tests.constants import (
     TEST_QUERY_PARAM, DIFFERENT_VALUES, MAX_POSITIVE_INTEGER,
+    FULL_TEST_QUERY_PARAMS, QUERY_PARAMS_WITHOUT_STATUS,
+    QUERY_PARAMS_WITHOUT_CPU_FROM, QUERY_PARAMS_WITHOUT_CPU_TO,
+    QUERY_PARAMS_WITHOUT_RAM_FROM, QUERY_PARAMS_WITHOUT_RAM_TO,
+    QUERY_PARAMS_WITHOUT_HDD_FROM, QUERY_PARAMS_WITHOUT_HDD_TO,
 )
 
 
@@ -64,3 +70,93 @@ class ViewsTests(TestCase):
                 self.assertEqual(
                     real_value_for_incorrect_request, MAX_POSITIVE_INTEGER
                 )
+
+    def test_get_vps_viewset_query_params(self):
+        """Test get_vps_viewset_query_params function"""
+
+        # Test full query param
+        for expected_query_param in FULL_TEST_QUERY_PARAMS:
+            test_request = HttpRequest()
+            test_request.query_params = expected_query_param
+
+            with self.subTest(''):
+                real_query_param = get_vps_viewset_query_params(test_request)
+
+                self.assertEqual(real_query_param, expected_query_param)
+
+        # Test query param without status
+        expected_query_param_without_status = QUERY_PARAMS_WITHOUT_STATUS.copy()
+        expected_query_param_without_status.update({'status': None})
+
+        test_request = HttpRequest()
+        test_request.query_params = QUERY_PARAMS_WITHOUT_STATUS
+        real_query_param = get_vps_viewset_query_params(test_request)
+
+        self.assertEqual(real_query_param, expected_query_param_without_status)
+
+        # Different request
+        for value in DIFFERENT_VALUES:
+            with self.subTest(f'{value=}'):
+                real_query_param = get_vps_viewset_query_params(value)
+
+                self.assertEqual(real_query_param, None)
+
+        # Test query param without cpu_from
+        expected_query_param_without_cpu_from = QUERY_PARAMS_WITHOUT_CPU_FROM.copy()
+        expected_query_param_without_cpu_from.update({'cpu_from': '0'})
+
+        test_request = HttpRequest()
+        test_request.query_params = QUERY_PARAMS_WITHOUT_CPU_FROM
+        real_query_param = get_vps_viewset_query_params(test_request)
+
+        self.assertEqual(real_query_param, expected_query_param_without_cpu_from)
+
+        # Test query param without ram_from
+        expected_query_param_without_ram_from = QUERY_PARAMS_WITHOUT_RAM_FROM.copy()
+        expected_query_param_without_ram_from.update({'ram_from': '0'})
+
+        test_request = HttpRequest()
+        test_request.query_params = QUERY_PARAMS_WITHOUT_RAM_FROM
+        real_query_param = get_vps_viewset_query_params(test_request)
+
+        self.assertEqual(real_query_param, expected_query_param_without_ram_from)
+
+        # Test query param without hdd_from
+        expected_query_param_without_hdd_from = QUERY_PARAMS_WITHOUT_HDD_FROM.copy()
+        expected_query_param_without_hdd_from.update({'hdd_from': '0'})
+
+        test_request = HttpRequest()
+        test_request.query_params = QUERY_PARAMS_WITHOUT_HDD_FROM
+        real_query_param = get_vps_viewset_query_params(test_request)
+
+        self.assertEqual(real_query_param, expected_query_param_without_hdd_from)
+
+        # Test query param without cpu_to
+        expected_query_param_without_cpu_to = QUERY_PARAMS_WITHOUT_CPU_TO.copy()
+        expected_query_param_without_cpu_to.update({'cpu_to': MAX_POSITIVE_INTEGER})
+
+        test_request = HttpRequest()
+        test_request.query_params = QUERY_PARAMS_WITHOUT_CPU_TO
+        real_query_param = get_vps_viewset_query_params(test_request)
+
+        self.assertEqual(real_query_param, expected_query_param_without_cpu_to)
+
+        # Test query param without ram_to
+        expected_query_param_without_ram_to = QUERY_PARAMS_WITHOUT_RAM_TO.copy()
+        expected_query_param_without_ram_to.update({'ram_to': MAX_POSITIVE_INTEGER})
+
+        test_request = HttpRequest()
+        test_request.query_params = QUERY_PARAMS_WITHOUT_RAM_TO
+        real_query_param = get_vps_viewset_query_params(test_request)
+
+        self.assertEqual(real_query_param, expected_query_param_without_ram_to)
+
+        # Test query param without hdd_to
+        expected_query_param_without_hdd_to = QUERY_PARAMS_WITHOUT_HDD_TO.copy()
+        expected_query_param_without_hdd_to.update({'hdd_to': MAX_POSITIVE_INTEGER})
+
+        test_request = HttpRequest()
+        test_request.query_params = QUERY_PARAMS_WITHOUT_HDD_TO
+        real_query_param = get_vps_viewset_query_params(test_request)
+
+        self.assertEqual(real_query_param, expected_query_param_without_hdd_to)
