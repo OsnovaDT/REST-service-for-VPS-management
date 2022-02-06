@@ -24,7 +24,13 @@ def get_param_or_zero(request: Request, param: str) -> str:
 def get_param_or_max_int(request: Request, param):
     """Return query parameter or max positive integer if it's None"""
 
-    return request.query_params.get(param) or settings.MAX_POSITIVE_INTEGER
+    try:
+        param = request.query_params.get(param) \
+            or settings.MAX_POSITIVE_INTEGER
+    except TypeError:
+        param = settings.MAX_POSITIVE_INTEGER
+
+    return param
 
 
 def get_vps_viewset_query_params(request: Request) -> dict:
