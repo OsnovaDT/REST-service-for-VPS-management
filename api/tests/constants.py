@@ -5,6 +5,12 @@ from random import choice
 
 MAX_POSITIVE_INTEGER = 2_147_483_647
 
+VPS_STATUSES_FOR_CHOICES = (
+    ('started', 'Started'),
+    ('blocked', 'Blocked'),
+    ('stopped', 'Stopped'),
+)
+
 ### SIMPLE_QUERY_PARAMS ###
 
 SIMPLE_QUERY_PARAMS = {}
