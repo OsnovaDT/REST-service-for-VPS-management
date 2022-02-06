@@ -43,8 +43,8 @@ class ViewsTests(TestCase):
                     value, 'param'
                 )
 
-                self.assertEqual(real_value_for_incorrect_param, '0')
-                self.assertEqual(real_value_for_incorrect_request, '0')
+                self.assertEqual(real_value_for_incorrect_param, 0)
+                self.assertEqual(real_value_for_incorrect_request, 0)
 
     def test_get_param_or_max_int(self):
         """Test get_param_or_max_int function"""
@@ -103,7 +103,7 @@ class ViewsTests(TestCase):
 
         # Test query param without cpu_from
         expected_query_param_without_cpu_from = QUERY_PARAMS_WITHOUT_CPU_FROM.copy()
-        expected_query_param_without_cpu_from.update({'cpu_from': '0'})
+        expected_query_param_without_cpu_from.update({'cpu_from': 0})
 
         test_request = HttpRequest()
         test_request.query_params = QUERY_PARAMS_WITHOUT_CPU_FROM
@@ -113,7 +113,7 @@ class ViewsTests(TestCase):
 
         # Test query param without ram_from
         expected_query_param_without_ram_from = QUERY_PARAMS_WITHOUT_RAM_FROM.copy()
-        expected_query_param_without_ram_from.update({'ram_from': '0'})
+        expected_query_param_without_ram_from.update({'ram_from': 0})
 
         test_request = HttpRequest()
         test_request.query_params = QUERY_PARAMS_WITHOUT_RAM_FROM
@@ -123,7 +123,7 @@ class ViewsTests(TestCase):
 
         # Test query param without hdd_from
         expected_query_param_without_hdd_from = QUERY_PARAMS_WITHOUT_HDD_FROM.copy()
-        expected_query_param_without_hdd_from.update({'hdd_from': '0'})
+        expected_query_param_without_hdd_from.update({'hdd_from': 0})
 
         test_request = HttpRequest()
         test_request.query_params = QUERY_PARAMS_WITHOUT_HDD_FROM

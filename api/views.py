@@ -14,23 +14,23 @@ def get_param_or_zero(request: Request, param: str) -> str:
     """Return query parameter or 0 if it's None"""
 
     try:
-        param = request.query_params.get(param) or '0'
-    except (TypeError, AttributeError):
-        param = '0'
+        param = int(request.query_params.get(param) or '0')
+    except (TypeError, AttributeError, ValueError):
+        param = 0
 
-    return str(param)
+    return int(param)
 
 
 def get_param_or_max_int(request: Request, param):
     """Return query parameter or max positive integer if it's None"""
 
     try:
-        param = request.query_params.get(param) \
-            or settings.MAX_POSITIVE_INTEGER
-    except (TypeError, AttributeError):
+        param = int(request.query_params.get(param) \
+            or settings.MAX_POSITIVE_INTEGER)
+    except (TypeError, AttributeError, ValueError):
         param = settings.MAX_POSITIVE_INTEGER
 
-    return param
+    return int(param)
 
 
 def get_vps_viewset_query_params(request: Request) -> dict:
@@ -70,7 +70,7 @@ class VPSViewSet(viewsets.ModelViewSet):
     # pagination_class = VPSPagination
     serializer_class = VPSSerializer
 
-    def list(self, request: Request):
+    def list(self, request: Request) -> Response:
         query_params = get_vps_viewset_query_params(request)
 
         if query_params:
