@@ -1,60 +1,81 @@
-"""Constants for testing"""
-
-TEST_QUERY_PARAM = {}
-
-for i in range(9):
-    TEST_QUERY_PARAM[f'cpu_from_{i}'] = 2 * 10 ** i
-    TEST_QUERY_PARAM[f'ram_from_{i}'] = 256 * 10 ** i
-    TEST_QUERY_PARAM[f'hdd_from_{i}'] = 512 * 10 ** i
-
-
-class TestClass:
-    """Class for testing"""
-
-    pass
-
-
-def test_function():
-    """Function for testing"""
-
-    pass
-
-
-DIFFERENT_VALUES = (
-    'zero_cpu_from', 'zero_ram_from', 'zero_hdd_from', '',
-    0, 100_000, True, False, '!@@#Q@$Q', (1, 2), [1, 2, 3],
-    {'a': 1, 'b': 2}, set([1, 2, 3]), 'test'.encode(), 'a' * 100,
-    # 'a' * 100_000, 'a' * 100_000_000,
-    122.12323, test_function,
-    [[1, 2, 3, (1, 2)]], None, complex(1, 2), -100, bin(20), hex(100),
-    range(100), 'class', 'def', 'int', '\n', '\t', TestClass,
-    lambda x: x, int, bool, str, object,
-)
-
-MAX_POSITIVE_INTEGER = 2_147_483_647
+"""Constants for testing api application"""
 
 from random import choice
 
-VPS_STATUS = ('started', 'expected', 'blocked',)
+
+MAX_POSITIVE_INTEGER = 2_147_483_647
+
+### SIMPLE_QUERY_PARAMS ###
+
+SIMPLE_QUERY_PARAMS = {}
+
+for i in range(9):
+    SIMPLE_QUERY_PARAMS[f'cpu_from_{i}'] = 2 * 10 ** i
+    SIMPLE_QUERY_PARAMS[f'ram_from_{i}'] = 256 * 10 ** i
+    SIMPLE_QUERY_PARAMS[f'hdd_from_{i}'] = 512 * 10 ** i
+
+### DIFFERENT_VALUES ###
+
+class TestClass:
+    """Empty class for testing"""
 
 
-FULL_TEST_QUERY_PARAMS = []
+def test_function():
+    """Empty function for testing"""
 
-for i in range(1):
-    QUERY_PARAM = {
-        'status': choice(VPS_STATUS),
-        'cpu_from': 2 * 10 ** i,
-        'cpu_to': 3 * 10 ** i,
-        'ram_from': 256 * 10 ** i,
-        'ram_to': 512 * 10 ** i,
-        'hdd_from': 512 * 10 ** i,
-        'hdd_to': 1024 * 10 ** i,
+
+DIFFERENT_VALUES = (
+    # Values of str and bytes type
+    'zero_cpu_from', 'zero_ram_from', 'zero_hdd_from', '', '!@@#Q@$Q',
+    'a' * 100, 'a' * 10_000, '\n', '\t', 'class', 'def', 'int',
+    'test'.encode(),
+
+    # Values of int, float and bool types
+    0, 100_000, -100, 122.12323, True, False,
+
+    # Data structures
+    [1, 2, 3], (1, 2), {'a': 1, 'b': 2}, set([1, 2, 3]), [[1, 2, 3, (1, 2)]],
+
+    # Types
+    int, bool, str, object, bytes, bytearray, tuple, list, dict, set, float,
+
+    # Classes and functions
+    TestClass, test_function, lambda x: x,
+
+    # Others
+    None, complex(1, 2), bin(20), hex(100), range(100),
+)
+
+### MULTIPLE_QUERY_PARAMS ###
+
+MULTIPLE_QUERY_PARAMS = []
+
+vps_statuses = ('started', 'expected', 'blocked',)
+
+for degree in range(9):
+    multiplier = 10 ** degree
+
+    query_params = {
+        'status': choice(vps_statuses),
+
+        'cpu_from': 2 * multiplier,
+        'cpu_to': 3 * multiplier,
+
+        'ram_from': 256 * multiplier,
+        'ram_to': 512 * multiplier,
+
+        'hdd_from': 512 * multiplier,
+        'hdd_to': 1024 * multiplier,
     }
 
-    FULL_TEST_QUERY_PARAMS.append(QUERY_PARAM)
+    MULTIPLE_QUERY_PARAMS.append(query_params)
 
+MULTIPLE_QUERY_PARAMS = tuple(MULTIPLE_QUERY_PARAMS)
 
-QUERY_PARAMS_WITHOUT_STATUS = {
+### NOT_FULL_QUERY_PARAMS ###
+
+full_query_params = {
+    'status': 'started',
     'cpu_from': 2,
     'cpu_to': 3,
     'ram_from': 256,
@@ -63,56 +84,33 @@ QUERY_PARAMS_WITHOUT_STATUS = {
     'hdd_to': 1024,
 }
 
-QUERY_PARAMS_WITHOUT_CPU_FROM = {
-    'status': 'started',
-    'cpu_to': 3,
-    'ram_from': 256,
-    'ram_to': 512,
-    'hdd_from': 512,
-    'hdd_to': 1024,
-}
+query_params_without_status = full_query_params.copy()
+query_params_without_status.pop('status')
 
-QUERY_PARAMS_WITHOUT_CPU_TO = {
-    'status': 'started',
-    'cpu_from': 2,
-    'ram_from': 256,
-    'ram_to': 512,
-    'hdd_from': 512,
-    'hdd_to': 1024,
-}
+query_params_without_cpu_from = full_query_params.copy()
+query_params_without_cpu_from.pop('cpu_from')
 
-QUERY_PARAMS_WITHOUT_RAM_FROM = {
-    'status': 'started',
-    'cpu_from': 2,
-    'cpu_to': 3,
-    'ram_to': 512,
-    'hdd_from': 512,
-    'hdd_to': 1024,
-}
+query_params_without_cpu_to = full_query_params.copy()
+query_params_without_cpu_to.pop('cpu_to')
 
-QUERY_PARAMS_WITHOUT_RAM_TO = {
-    'status': 'started',
-    'cpu_from': 2,
-    'cpu_to': 3,
-    'ram_from': 256,
-    'hdd_from': 512,
-    'hdd_to': 1024,
-}
+query_params_without_ram_from = full_query_params.copy()
+query_params_without_ram_from.pop('ram_from')
 
-QUERY_PARAMS_WITHOUT_HDD_FROM = {
-    'status': 'started',
-    'cpu_from': 2,
-    'cpu_to': 3,
-    'ram_from': 256,
-    'ram_to': 512,
-    'hdd_to': 1024,
-}
+query_params_without_ram_to = full_query_params.copy()
+query_params_without_ram_to.pop('ram_to')
 
-QUERY_PARAMS_WITHOUT_HDD_TO = {
-    'status': 'started',
-    'cpu_from': 2,
-    'cpu_to': 3,
-    'ram_from': 256,
-    'ram_to': 512,
-    'hdd_from': 512,
+query_params_without_hdd_from = full_query_params.copy()
+query_params_without_hdd_from.pop('hdd_from')
+
+query_params_without_hdd_to = full_query_params.copy()
+query_params_without_hdd_to.pop('hdd_to')
+
+NOT_FULL_QUERY_PARAMS = {
+    'without_status': query_params_without_status,
+    'without_cpu_from': query_params_without_cpu_from,
+    'without_cpu_to': query_params_without_cpu_to,
+    'without_ram_from': query_params_without_ram_from,
+    'without_ram_to': query_params_without_ram_to,
+    'without_hdd_from': query_params_without_hdd_from,
+    'without_hdd_to': query_params_without_hdd_to,
 }
