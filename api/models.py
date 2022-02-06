@@ -1,9 +1,9 @@
-"""Models of api app"""
+"""Models of api application"""
 
 from django.db import models
 
 
-VPS_STATUS = (
+VPS_STATUSES = (
     ('started', 'Started'),
     ('blocked', 'Blocked'),
     ('stopped', 'Stopped'),
@@ -36,7 +36,7 @@ class VPS(models.Model):
 
     status = models.CharField(
         max_length=10,
-        choices=VPS_STATUS,
+        choices=VPS_STATUSES,
         db_index=True,
     )
 
@@ -44,8 +44,8 @@ class VPS(models.Model):
         return str(self.uid) + ' (' + str(self.status) + ')'
 
     class Meta:
-        """Info about the model"""
+        """Info about the VPS model"""
 
         verbose_name = 'VPS'
         verbose_name_plural = 'VPS'
-        ordering = ['-uid']
+        ordering = ('-uid',)

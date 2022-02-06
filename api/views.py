@@ -1,40 +1,39 @@
-"""Views for api app"""
+"""Views for api application"""
 
-from django.conf import settings
-from rest_framework import viewsets
-from rest_framework.pagination import PageNumberPagination
+from django.db.models.query import QuerySet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.request import Request
 
 from api.models import VPS
 from api.serializers import VPSSerializer
+from api.constants import ERRORS_IN_GETTING_PARAMETER, MAX_POSITIVE_INTEGER
 
 
-def get_param_or_zero(request: Request, param: str) -> str:
+def get_param_or_zero(request: Request, param: str) -> int:
     """Return query parameter or 0 if it's None"""
 
     try:
-        param = int(request.query_params.get(param) or '0')
-    except (TypeError, AttributeError, ValueError):
+        param = int(request.query_params.get(param) or 0)
+    except ERRORS_IN_GETTING_PARAMETER:
         param = 0
 
     return int(param)
 
 
-def get_param_or_max_int(request: Request, param):
+def get_param_or_max_int(request: Request, param: str) -> int:
     """Return query parameter or max positive integer if it's None"""
 
     try:
-        param = int(request.query_params.get(param) \
-            or settings.MAX_POSITIVE_INTEGER)
-    except (TypeError, AttributeError, ValueError):
-        param = settings.MAX_POSITIVE_INTEGER
+        param = int(request.query_params.get(param) or MAX_POSITIVE_INTEGER)
+    except ERRORS_IN_GETTING_PARAMETER:
+        param = MAX_POSITIVE_INTEGER
 
     return int(param)
 
 
-def get_vps_viewset_query_params(request: Request) -> dict:
-    """Return query params from VPS viewset request"""
+def get_vps_query_params(request: Request) -> dict | None:
+    """Return query params for VPS viewset"""
 
     try:
         query_params = {
@@ -55,35 +54,34 @@ def get_vps_viewset_query_params(request: Request) -> dict:
     return query_params
 
 
-class VPSPagination(PageNumberPagination):
-    """Pagination for VPS viewset"""
+def get_vps_queryset_by_query_params(query_params: dict) -> QuerySet:
+    """Return queryset for VPS by query params"""
 
-    page_size = 20
-    page_size_query_param = 'page_size'
+    queryset = VPS.objects.filter(
+        cpu__range=(query_params['cpu_from'], query_params['cpu_to']),
+        ram__range=(query_params['ram_from'], query_params['ram_to']),
+        hdd__range=(query_params['hdd_from'], query_params['hdd_to']),
+    )
+
+    status = query_params['status']
+
+    if status:
+        queryset = queryset.filter(status=status)
+
+    return queryset
 
 
-class VPSViewSet(viewsets.ModelViewSet):
+class VPSViewSet(ModelViewSet):
     """Viewset for VPS objects"""
 
     queryset = VPS.objects.all()
-
-    # pagination_class = VPSPagination
     serializer_class = VPSSerializer
 
     def list(self, request: Request) -> Response:
-        query_params = get_vps_viewset_query_params(request)
+        query_params = get_vps_query_params(request)
 
         if query_params:
-            status = query_params['status']
-
-            queryset = VPS.objects.filter(
-                cpu__range=(query_params['cpu_from'], query_params['cpu_to']),
-                ram__range=(query_params['ram_from'], query_params['ram_to']),
-                hdd__range=(query_params['hdd_from'], query_params['hdd_to']),
-            )
-
-            if status:
-                queryset = queryset.filter(status=status)
+            queryset = get_vps_queryset_by_query_params(query_params)
         else:
             queryset = VPS.objects.all()
 

@@ -1,4 +1,4 @@
-"""Settings for the project"""
+"""Settings of the project"""
 
 from pathlib import Path
 from os.path import join
@@ -123,5 +123,3 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-MAX_POSITIVE_INTEGER = 2_147_483_647
