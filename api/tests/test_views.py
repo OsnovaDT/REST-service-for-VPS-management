@@ -214,6 +214,8 @@ class ViewsTests(TestCase):
             with self.subTest(status):
                 self.assertEqual(set(real_queryset), set(expected_queryset))
 
+        # Test that «except» part work correctly
+
         # Test KeyError except
 
         queryset_without_cpu_to = get_vps_queryset_by_query_params(
@@ -227,7 +229,8 @@ class ViewsTests(TestCase):
         self.assertEqual(type(queryset_without_cpu_to), QuerySet)
         self.assertEqual(type(queryset_without_hdd_from), QuerySet)
 
-        # Test that «except» part work correctly
+        # Test TypeError except
+
         for value in DIFFERENT_VALUES:
             real_queryset = get_vps_queryset_by_query_params(value)
 
