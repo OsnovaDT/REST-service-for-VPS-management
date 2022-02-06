@@ -57,17 +57,20 @@ def get_vps_query_params(request: Request) -> dict | None:
 def get_vps_queryset_by_query_params(query_params: dict) -> QuerySet:
     """Return queryset for VPS by query params"""
 
-    queryset = VPS.objects.filter(
-        cpu__range=(query_params['cpu_from'], query_params['cpu_to']),
-        ram__range=(query_params['ram_from'], query_params['ram_to']),
-        hdd__range=(query_params['hdd_from'], query_params['hdd_to']),
-    )
+    try:
+        queryset = VPS.objects.filter(
+            cpu__range=(query_params['cpu_from'], query_params['cpu_to']),
+            ram__range=(query_params['ram_from'], query_params['ram_to']),
+            hdd__range=(query_params['hdd_from'], query_params['hdd_to']),
+        )
 
-    if 'status' in query_params.keys():
-        status = query_params['status']
+        if 'status' in query_params.keys():
+            status = query_params['status']
 
-        if status:
-            queryset = queryset.filter(status=status)
+            if status:
+                queryset = queryset.filter(status=status)
+    except (TypeError, KeyError):
+        queryset = VPS.objects.all()
 
     return queryset
 
